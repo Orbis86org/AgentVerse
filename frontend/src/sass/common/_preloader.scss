@@ -1,0 +1,68 @@
+/*--------------------------------------------------------------
+  2. Preloader
+----------------------------------------------------------------*/
+.cs_perloader {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 999999;
+  background: $primary;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cs_perloader_dots_wrap {
+  display: block;
+  margin: 0px auto;
+  width: 97px;
+  transform: scale(2);
+  .cs_perloader_dots {
+    i {
+      width: 19px;
+      height: 19px;
+      display: inline-block;
+      border-radius: 50%;
+      background: $accent;
+      &:first-child {
+        opacity: 0;
+        animation: cs_perloader_dots-ani2 0.58s linear infinite;
+        transform: translate(-19px);
+      }
+      &:nth-child(2),
+      &:nth-child(3) {
+        animation: cs_perloader_dots-ani3 0.58s linear infinite;
+      }
+      &:last-child {
+        animation: cs_perloader_dots-ani1 0.58s linear infinite;
+      }
+    }
+  }
+}
+
+@keyframes cs_perloader_dots-ani1 {
+  100% {
+    transform: translate(39px);
+    opacity: 0;
+  }
+}
+@keyframes cs_perloader_dots-ani2 {
+  100% {
+    transform: translate(19px);
+    opacity: 1;
+  }
+}
+@keyframes cs_perloader_dots-ani3 {
+  100% {
+    transform: translate(19px);
+  }
+}
+.cs_perloader_text {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 20px;
+  color: rgb(255 255 255 / 50%);
+  letter-spacing: 3px;
+}

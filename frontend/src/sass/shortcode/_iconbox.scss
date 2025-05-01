@@ -1,0 +1,454 @@
+/*--------------------------------------------------------------
+  12. Iconbox
+----------------------------------------------------------------*/
+.cs_iconbox.cs_style_1 {
+  padding: 50px 35px 45px 35px;
+  .cs_iconbox_icon {
+    height: 70px;
+    width: 80px;
+    margin-bottom: 27px;
+    img {
+      position: relative;
+      z-index: 2;
+    }
+  }
+  .cs_iconbox_icon_shape {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.6s ease;
+  }
+  .cs_iconbox_subtitle {
+    color: #ddd;
+    margin-bottom: 26px;
+  }
+  .cs_iconbox_title {
+    margin-bottom: 25px;
+  }
+  .cs_iconbox_btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 17px;
+    &:hover {
+      letter-spacing: 1px;
+    }
+  }
+  &:hover {
+    .cs_iconbox_icon_shape {
+      transform: translate(-50%, -50%) rotate(25deg);
+    }
+  }
+}
+.cs_iconbox.cs_style_2 {
+  .cs_iconbox_icon {
+    margin-bottom: 35px;
+    img {
+      animation: heroShapeAnim 10s linear infinite alternate;
+      animation-play-state: paused;
+    }
+  }
+  .cs_iconbox_title {
+    margin-bottom: 16px;
+  }
+  .cs_iconbox_subtitle {
+    margin-bottom: 20px;
+  }
+  .cs_iconbox_features {
+    li {
+      &:not(:last-child) {
+        margin-bottom: 5px;
+      }
+    }
+  }
+  &:hover {
+    .cs_iconbox_icon {
+      img {
+        animation-play-state: initial;
+      }
+    }
+  }
+}
+.cs_iconbox.cs_style_4 {
+  border: 1px solid rgba($primary, 0.15);
+  display: flex;
+  padding: 40px;
+  gap: 40px;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+  @media (max-width: 1199px) {
+    padding: 25px;
+    gap: 25px;
+  }
+  @media (max-width: 400px) {
+    flex-direction: column;
+  }
+  &::before {
+    content: '';
+    position: absolute;
+    left: -55px;
+    top: -55px;
+    height: 135px;
+    width: 135px;
+    background: #fd6219;
+    filter: blur(125px);
+    transition: all 0.4s ease;
+    opacity: 0;
+  }
+  .cs_iconbox_icon {
+    flex: none;
+    width: 82px;
+    @media (max-width: 1199px) {
+      width: 60px;
+    }
+    img {
+      width: 100%;
+    }
+  }
+  .cs_btn.cs_style_1 {
+    border: none;
+    padding: 0;
+    span {
+      &::after {
+        color: $accent;
+      }
+    }
+    &:hover {
+      background-color: transparent;
+      color: $accent;
+    }
+  }
+  .cs_iconbox_title {
+    margin-bottom: 15px;
+  }
+  .cs_iconbox_subtitle {
+    margin-bottom: 25px;
+  }
+  &:hover {
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+.cs_iconbox.cs_style_5 {
+  padding: 40px 30px;
+  .cs_iconbox_icon {
+    margin-bottom: 22px;
+    height: 61px;
+  }
+  .cs_iconbox_title {
+    margin-bottom: 15px;
+  }
+  .cs_iconbox_subtitle {
+    margin-bottom: 30px;
+  }
+  .cs_iconbox_btn {
+    color: #fff;
+    &:hover {
+      color: $accent;
+    }
+  }
+  &:hover {
+    .cs_iconbox_icon {
+      animation: spinAnimaiton 1.5s linear;
+    }
+  }
+}
+.cs_iconbox.cs_style_6 {
+  min-height: 390px;
+  width: 100%;
+  border-radius: 50%;
+  border: 1px solid $accent;
+  padding: 60px;
+  overflow: hidden;
+  position: relative;
+  @media (max-width: 1400px) {
+    min-height: 330px;
+    padding: 40px;
+  }
+  @media (max-width: 1199px) {
+    min-height: 300px;
+    padding: 30px;
+  }
+  @media (max-width: 991px) {
+    min-height: 360px;
+    padding: 40px;
+  }
+  .cs_iconbox_icon {
+    margin-bottom: 22px;
+  }
+  .cs_iconbox_title {
+    margin-bottom: 15px;
+  }
+  .cs_iconbox_bg {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    animation: heroShapeAnim 30s linear infinite alternate;
+    animation-play-state: paused;
+  }
+  .cs_iconbox_in {
+    position: relative;
+    z-index: 2;
+  }
+  &:hover {
+    .cs_iconbox_bg {
+      animation-play-state: initial;
+    }
+  }
+}
+.cs_icon_7_wrap {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-gap: 40px;
+  @media (max-width: 1400px) {
+    grid-gap: 25px;
+  }
+  @media (max-width: 1199px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  @media (max-width: 991px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @media (max-width: 767px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 400px) {
+    grid-gap: 15px;
+  }
+  @media (max-width: 350px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+.cs_iconbox.cs_style_7 {
+  border: 1px solid #a3a3a3;
+  border-radius: 20px;
+  min-height: 223px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.8s ease;
+  padding: 15px;
+  gap: 15px;
+  &:hover {
+    transform: scale(1.03);
+  }
+  @media (max-width: 575px) {
+    min-height: 180px;
+  }
+}
+//////////////////////////////
+
+.cs_image_layer.cs_style_1 {
+  padding-right: 60px;
+  padding-bottom: 60px;
+  img {
+    position: relative;
+    z-index: 2;
+  }
+  .cs_image_layer_in {
+    position: relative;
+    border-radius: 15px;
+    &::after {
+      content: '';
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      right: -60px;
+      bottom: -60px;
+      background-color: $accent;
+      border-radius: inherit;
+    }
+  }
+  &.cs_size_md {
+    padding-right: 20px;
+    padding-bottom: 20px;
+    .cs_image_layer_in {
+      &::after {
+        right: -20px;
+        bottom: -20px;
+      }
+    }
+  }
+}
+.cs_iconbox_3_list {
+  position: relative;
+  padding-left: 550px;
+  min-height: 640px;
+  @media (max-width: 1400px) {
+    padding-left: 520px;
+  }
+  > *:not(:last-child) {
+    border-bottom: 1px solid #4d4d4d;
+  }
+  .cs_image_layer {
+    position: absolute;
+    left: 0;
+    top: 25px;
+    pointer-events: none;
+    max-width: 416px;
+    height: 600px;
+    @media (max-width: 1400px) {
+      height: 640px;
+    }
+    .cs_image_layer_in {
+      height: 100%;
+      width: 100%;
+    }
+    img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+      position: relative;
+      clip-path: inset(0 100% 0 0);
+      animation: inactiveImageAnimation1 0.6s forwards ease;
+    }
+  }
+  .cs_hover_tab.active {
+    .cs_image_layer {
+      img {
+        animation: activeImageAnimation1 0.6s forwards ease;
+      }
+    }
+    .cs_iconbox_icon {
+      color: #fff;
+      background-color: $accent;
+      border-color: $accent;
+      svg {
+        &:last-child {
+          position: absolute;
+          left: 23px;
+          bottom: 23px;
+          @media (max-width: 575px) {
+            left: 13px;
+            bottom: 17px;
+          }
+        }
+        &:first-child {
+          transform: translate(44px, -40px);
+        }
+      }
+    }
+  }
+}
+.cs_iconbox.cs_style_3 {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  padding-bottom: 25px;
+  padding-top: 25px;
+  color: $secondary;
+  @media (max-width: 1400px) {
+    padding-bottom: 20px;
+    padding-top: 20px;
+  }
+  .cs_iconbox_in {
+    margin-right: 30px;
+    max-width: 580px;
+    @media (max-width: 1199px) {
+      margin-right: 23px;
+    }
+  }
+  .cs_iconbox_icon {
+    color: #4f4747;
+    border: 2px solid #4f4747;
+    height: 80px;
+    width: 80px;
+    border-radius: 50%;
+    flex: none;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    svg {
+      transition: all 0.3s;
+      &:first-child {
+        transform: translate(0, 0);
+      }
+      &:last-child {
+        position: absolute;
+        left: -20px;
+        bottom: -20px;
+      }
+    }
+    &:hover {
+      color: #fff;
+      background-color: $accent;
+      border-color: $accent;
+    }
+  }
+  .cs_iconbox_title {
+    margin-bottom: 15px;
+    color: #fff;
+    @media (max-width: 1400px) {
+      margin-bottom: 10px;
+    }
+  }
+  .cs_iconbox_subtitle {
+    color: #dddddd;
+  }
+  &:hover {
+    .cs_iconbox_icon {
+      color: #fff;
+      background-color: $accent;
+      border-color: $accent;
+    }
+  }
+}
+@keyframes inactiveImageAnimation1 {
+  0% {
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    clip-path: inset(0 100% 0 0);
+  }
+}
+@keyframes activeImageAnimation1 {
+  0% {
+    clip-path: inset(0 0 0 100%);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@media screen and (max-width: 1199px) {
+  .cs_iconbox_3_list {
+    padding-left: 460px;
+  }
+}
+@media screen and (max-width: 991px) {
+  .cs_iconbox.cs_style_3 {
+    .cs_iconbox_title {
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+  }
+  .cs_iconbox_3_list {
+    padding-left: 0;
+    padding-top: 690px;
+    .cs_image_layer {
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+}
+@media screen and (max-width: 575px) {
+  .cs_iconbox.cs_style_3 {
+    flex-direction: column;
+    align-items: flex-start;
+    .cs_iconbox_icon {
+      position: relative;
+      transform: initial;
+      margin-bottom: 20px;
+      height: 60px;
+      width: 60px;
+      svg {
+        max-height: 22px;
+      }
+    }
+  }
+}

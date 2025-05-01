@@ -1,0 +1,236 @@
+/*--------------------------------------------------------------
+  24. Dark Mode
+----------------------------------------------------------------*/
+.cs_dark {
+  color: #a3a3a3;
+  background-color: #171717;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .cs_primary_color,
+  .cs_btn.cs_style_1,
+  .cs_btn.cs_style_1 i,
+  .cs_pricing_control,
+  .cs_nav .cs_nav_list,
+  input,
+  textarea,
+  .cs-sidebar_search_btn:hover,
+  .cs_iconbox_3_list .cs_hover_tab.active .cs_iconbox_icon {
+    color: #fff;
+  }
+  .cs_hero.cs_style_1 .cs_video_block_wrap::before,
+  .cs_progressbar.cs_style_1 .cs_progress_in::before,
+  .cs_round_progress_wrap {
+    background-color: #171717;
+  }
+  .cs_pagination.cs_style_1 .swiper-pagination-bullet {
+    background-color: #a3a3a3;
+  }
+
+  .cs_swiper_navigation.cs_style_1 > :not(:last-child) {
+    border-color: #a3a3a3;
+  }
+
+  .cs_accordian_toggle::before,
+  .cs_accordian_toggle::after,
+  .cs_pricing_control .cs_switch {
+    background-color: #fff;
+  }
+
+  .cs_accordian_toggle {
+    border-color: #fff;
+  }
+  .cs_gray_bg,
+  .cs_pricing_control .cs_switch::before {
+    background-color: #121212;
+  }
+  .cs_moving_text_wrap.cs_style_1,
+  .cs_cta.cs_style_2 .cs_cta_title {
+    -webkit-text-stroke-color: #fff;
+  }
+  .cs_iconbox.cs_style_4,
+  .cs_accordians.cs_style_1.cs_type_1 .cs_accordian:not(:last-child),
+  .cs_brands.cs_style_2 .cs_brand,
+  .cs_case_study_info,
+  .cs_accordian,
+  .cs_round_progress_in::after,
+  .cs_iconbox.cs_style_3 .cs_iconbox_icon,
+  .cs_iconbox_3_list > *:not(:last-child),
+  .cs_image_box_1_list.cs_color_1 li:not(:last-child),
+  .cs_pricing_table.cs_style1 .cs_pricing_info,
+  .cs_image_box_1_list li:not(:last-child),
+  .cs-sidebar_search input,
+  .cs_author_card,
+  .cs_form_field_2 {
+    border-color: #4f4747;
+  }
+  .cs_counter_1_wrap .cs_counter.cs_style_1:not(:nth-child(4n + 0))::before {
+    background-color: #474747;
+  }
+  .cs_form_field_2:focus,
+  .cs_iconbox_3_list .cs_hover_tab.active .cs_iconbox_icon {
+    border-color: $accent;
+  }
+  .cs_iconbox.cs_style_3 .cs_iconbox_icon {
+    color: #474747;
+  }
+  .cs_gray_bg_2,
+  .cs_gray_bg_3 {
+    background-color: rgba(79, 71, 71, 0.1);
+  }
+  .cs_accent_color {
+    color: $accent;
+  }
+  .cs_newsletter.cs_style_1 .cs_btn.cs_style_1 {
+    border-color: #121212;
+    color: #121212;
+    &:hover {
+      background-color: #121212;
+      color: #fff;
+    }
+  }
+  .cs_newsletter.cs_style_1 .cs_btn.cs_style_1 {
+    i {
+      color: #121212;
+    }
+    &:hover {
+      i {
+        color: #fff;
+      }
+    }
+  }
+  .cs_portfolio.cs_style_2 .cs_portfolio_thumb::before {
+    background: linear-gradient(
+      90deg,
+      rgba(25, 25, 25, 0.99) 0%,
+      rgba(25, 25, 25, 0) 49.95%
+    );
+  }
+  .cs_mission,
+  .cs_vision {
+    h2,
+    p,
+    .cs_primary_color {
+      color: $primary;
+    }
+  }
+  .cs_about.cs_style_2 .cs_sales_card h3 {
+    color: $primary;
+  }
+  .cs_progress {
+    background-color: #dddddd;
+  }
+  .cs_hero.cs_style_4 .cs_hero_shape svg path {
+    stroke: #4f4747;
+    opacity: 0.5;
+  }
+  .cs_nav .cs_nav_list ul,
+  .cs_primary_bg,
+  .cs_primary_bg_hover:hover,
+  .cs_gescout_sticky,
+  .cs_site_header.cs_style_1.cs_color_1.cs_gescout_show,
+  .cs_nav .cs_nav_list > li > ul::before {
+    background-color: #000;
+  }
+  @media (max-width: 1199px) {
+    .cs_nav .cs_nav_list ul {
+      background-color: transparent;
+    }
+    .cs_nav .cs_nav_list {
+      background-color: #000;
+    }
+  }
+  .cs_author_card .cs_social_btns.cs_style_1 a {
+    border-color: #fff;
+    color: #fff;
+    &:hover {
+      color: $accent;
+      border-color: $accent;
+    }
+  }
+  .cs_form_field {
+    color: $primary;
+    background-color: #fff;
+  }
+  .cs_section_heading.cs_style_1.cs_type_3 .cs_shape_1,
+  .cs_section_heading.cs_style_1.cs_type_3 .cs_shape_2,
+  .cs_section_heading.cs_style_1.cs_type_3 .cs_shape_3 {
+    border-color: rgba(163, 163, 163, 0.1);
+  }
+  .swiper-pagination-bullets.cs_number_pagination
+    .swiper-pagination-bullet:hover,
+  .swiper-pagination-bullets.cs_number_pagination
+    .swiper-pagination-bullet.swiper-pagination-bullet-active {
+    border-color: #fff;
+    color: #fff;
+  }
+  /* Start Shop */
+  .cs_single_product_info b,
+  .cs_shop_search .cs_shop_search_input,
+  .cs_product_tab,
+  .cs_quantity,
+  .cs_shop-input {
+    color: #fff;
+  }
+  .cs_product_meta_info,
+  .cs_shop_search .cs_shop_search_input,
+  .cs_shop_sidebar_tag_list a,
+  .cs_shop_form_field,
+  table td,
+  table th,
+  .cs_shop-card,
+  .cs_quantity_input,
+  .cs_shop-card table,
+  .cs_shop-input,
+  .cs_order-summery li:not(:last-child),
+  .cs_portfolio_details_info,
+  .cs_hero.cs_style_3 .cs_moving_text_wrap {
+    border-color: #4f4747;
+  }
+  .cs_shop-input:focus,
+  .cs_shop_search .cs_shop_search_input:focus,
+  .cs_coupon-doce-form input:focus {
+    border-color: #fff;
+  }
+  .cs_page_navigation > div:not(:last-child)::after {
+    background-color: #4f4747;
+  }
+
+  .cs_shop_sidebar,
+  .cs_order-summery {
+    background-color: #000;
+  }
+  .cs_coupon-doce-form input::placeholder,
+  .cs_shop_search .cs_shop_search_input::placeholder,
+  .cs_shop_form_field::placeholder {
+    color: #e4e4e4;
+    opacity: 1;
+  }
+
+  .cs_coupon-doce-form input::-ms-input-placeholder,
+  .cs_shop_search .cs_shop_search_input::-ms-input-placeholder,
+  .cs_shop_form_field::-ms-input-placeholder {
+    color: #e4e4e4;
+  }
+  .cs_shop_search .cs_shop_search_btn svg path {
+    fill: #fff;
+  }
+  .st-amount-wrap #amount {
+    color: #a3a3a3;
+  }
+  .cs_shop_sidebar_tag_list a:hover {
+    border-color: $accent;
+  }
+
+  .cs_shape_animation_3 .cs_shape_1 {
+    color: #4f4747;
+    .anio_3_c_1 {
+      fill: #171717;
+    }
+  }
+
+  /* End Shop */
+}

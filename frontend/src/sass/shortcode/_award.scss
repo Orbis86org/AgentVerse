@@ -1,0 +1,63 @@
+/*--------------------------------------------------------------
+  18. Award
+----------------------------------------------------------------*/
+.cs_awaard.cs_style_1 {
+  display: flex;
+  gap: 15px;
+  justify-content: space-between;
+  position: relative;
+  .cs_awaard_subtitle {
+    color: #ddd;
+  }
+  .cs_awaard_brand {
+    width: 20%;
+    @media (max-width: 991px) {
+      width: 100%;
+    }
+  }
+  .cs_awaard_info {
+    width: 40%;
+    @media (max-width: 991px) {
+      width: 100%;
+    }
+  }
+  .cs_awaard_time {
+    width: 30%;
+    text-align: right;
+    @media (max-width: 991px) {
+      width: 100%;
+      font-size: 18px;
+    }
+  }
+  .cs_award_img {
+    position: absolute;
+    opacity: 0;
+    top: -100px;
+    left: -50px;
+    height: 200px;
+    width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s, transform 0.7s cubic-bezier(0.22, 1, 0.3, 1);
+    pointer-events: none;
+  }
+  &:hover {
+    .cs_award_img {
+      opacity: 1;
+    }
+  }
+  @media (max-width: 991px) {
+    flex-direction: column;
+  }
+}
+.cs_awaard_1_list {
+  border-top: 1px solid $secondary;
+  .cs_awaard.cs_style_1 {
+    border-bottom: 1px solid $secondary;
+    padding: 41px 0;
+    .cs_awaard_time {
+      text-align: right;
+    }
+  }
+}

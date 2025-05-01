@@ -1,0 +1,139 @@
+/*--------------------------------------------------------------
+  8. Footer
+----------------------------------------------------------------*/
+.cs_fooer {
+  color: $border;
+  background-attachment: fixed;
+}
+.cs_fooer_main {
+  padding: 145px 0 37px;
+  @media (max-width: 991px) {
+    padding: 80px 0 10px;
+  }
+}
+.cs_footer_item {
+  margin-bottom: 45px;
+  .cs_newsletter.cs_style_1 {
+    margin-top: 6px;
+  }
+}
+
+.cs_widget_title {
+  font-size: 21px;
+  margin-bottom: 27px;
+  font-weight: 600;
+  color: #fff;
+  @media (max-width: 991px) {
+    margin-bottom: 24px;
+  }
+}
+
+.cs_menu_widget {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  line-height: 1.625em;
+  li {
+    &:not(:last-child) {
+      margin-bottom: 12px;
+      @media (max-width: 991px) {
+        margin-bottom: 8px;
+      }
+    }
+  }
+}
+
+.cs_text_widget {
+  p {
+    margin: 0;
+  }
+  img + p {
+    margin-top: 30px;
+  }
+  + .cs_menu_widget {
+    margin-top: 32px;
+  }
+}
+
+.cs_social_btns.cs_style_1 {
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 14px;
+  gap: 10px;
+  a {
+    height: 35px;
+    width: 35px;
+    border-radius: 50%;
+    border: 1px solid $white;
+    &:hover {
+      border-color: $accent;
+      transform: scale(1.08);
+      svg {
+        fill: $accent;
+      }
+    }
+  }
+}
+
+.cs_newsletter.cs_style_1 {
+  .cs_newsletter_form {
+    position: relative;
+  }
+  .cs_newsletter_input {
+    height: 60px;
+    width: 100%;
+    border-radius: 10px;
+    background-color: #fff;
+    border: none;
+    padding: 5px 125px 5px 15px;
+    outline: none;
+    color: $primary;
+  }
+  .cs_btn.cs_style_1 {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    z-index: 1;
+    padding: 10px 15px;
+    background-color: #fff;
+    &:hover {
+      background-color: $accent;
+    }
+  }
+  .cs_newsletter_text {
+    margin-bottom: 36px;
+  }
+}
+.cs_footer_links {
+  display: flex;
+  flex-wrap: wrap;
+  li {
+    &:not(:last-child) {
+      &::after {
+        content: '|';
+        margin: 0 10px;
+        position: relative;
+        top: -1px;
+      }
+    }
+  }
+}
+
+.cs_bottom_footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32px 0;
+  border-top: 1px solid #2f2c2c;
+  color: #fff;
+  gap: 15px;
+  @media (max-width: 767px) {
+    flex-direction: column;
+  }
+}
+.cs_fooer_2 {
+  .cs_bottom_footer {
+    border: none;
+  }
+}

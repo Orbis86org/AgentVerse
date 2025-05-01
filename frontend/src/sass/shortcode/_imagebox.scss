@@ -1,0 +1,120 @@
+/*--------------------------------------------------------------
+  21. Imagebox
+----------------------------------------------------------------*/
+.cs_image_box_1_list {
+  li {
+    &:not(:last-child) {
+      border-bottom: 1px solid rgba($primary, 0.2);
+      padding-bottom: 35px;
+      margin-bottom: 35px;
+    }
+  }
+  &.cs_color_1 {
+    .cs_primary_color,
+    .cs_image_box_title {
+      color: #fff;
+    }
+    .cs_image_box_subtitle,
+    .cs_image_box_btn {
+      color: $gray2;
+    }
+    li {
+      &:not(:last-child) {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+}
+.cs_image_box.cs_style_1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px 135px;
+  @media (max-width: 1199px) {
+    gap: 20px 50px;
+  }
+  @media (max-width: 767px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .cs_image_box_title {
+    margin-bottom: 17px;
+  }
+  .cs_image_box_number {
+    width: 60px;
+    flex: none;
+  }
+  .cs_image_box_info {
+    padding-right: 188px;
+    @media (max-width: 1199px) {
+      padding-right: 100px;
+    }
+    @media (max-width: 575px) {
+      padding-right: 0px;
+    }
+  }
+  .cs_image_box_img {
+    flex: none;
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+    img {
+      transform: scale(1.07);
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+      transition: all 0.6s ease;
+    }
+  }
+  .cs_image_box_btn {
+    height: 80px;
+    width: 80px;
+    border: 2px solid;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    transition: all 0.4s ease;
+    overflow: hidden;
+    svg {
+      transition: all 0.3s;
+      &:first-child {
+        transform: translate(0, 0);
+      }
+      &:last-child {
+        position: absolute;
+        left: -20px;
+        bottom: -20px;
+      }
+    }
+    &:hover {
+      svg {
+        &:last-child {
+          position: absolute;
+          left: 23px;
+          bottom: 23px;
+        }
+        &:first-child {
+          transform: translate(44px, -40px);
+        }
+      }
+    }
+    @media (max-width: 575px) {
+      position: relative !important;
+      transform: scale(0.7);
+      margin-top: 10px;
+      margin-left: -12px;
+    }
+  }
+  &:hover {
+    .cs_image_box_btn {
+      border-color: $accent;
+      color: #fff;
+      background-color: $accent;
+    }
+    .cs_image_box_img {
+      img {
+        transform: scale(1.07) translateX(-6px);
+      }
+    }
+  }
+}

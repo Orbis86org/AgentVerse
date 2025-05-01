@@ -1,0 +1,78 @@
+/*--------------------------------------------------------------
+  17. Counter
+----------------------------------------------------------------*/
+.odometer-inside {
+  display: flex;
+}
+.cs_counter_1_wrap {
+  display: flex;
+  justify-content: center;
+  gap: 5px 100px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  .cs_counter.cs_style_1 {
+    width: 25%;
+    @media (min-width: 575px) {
+      &:not(:nth-child(4n + 0)) {
+        &::before {
+          content: '';
+          height: 56px;
+          width: 1px;
+          background-color: $secondary;
+          position: absolute;
+          right: -50px;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+      }
+    }
+    &:last-child {
+      &::before {
+        display: none;
+      }
+    }
+  }
+  @media (max-width: 1400px) {
+    gap: 5px 50px;
+    .cs_counter.cs_style_1 {
+      &:not(:nth-child(4n + 0)) {
+        &::before {
+          right: -25px;
+        }
+      }
+    }
+  }
+  @media (max-width: 1199px) {
+    flex-wrap: wrap;
+    gap: 20px 50px;
+    .cs_counter.cs_style_1 {
+      width: calc(50% - 25px);
+      &:nth-child(2) {
+        &::before {
+          display: none;
+        }
+      }
+    }
+  }
+  @media (max-width: 991px) {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  @media (max-width: 575px) {
+    flex-direction: column;
+    gap: 15px;
+    .cs_counter.cs_style_1 {
+      width: 100%;
+      max-width: 220px;
+      margin: auto;
+    }
+  }
+}
+.cs_counter.cs_style_1 {
+  gap: 17px;
+  @media (max-width: 575px) {
+    .cs_counter_nmber {
+      min-width: 70px;
+    }
+  }
+}

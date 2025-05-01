@@ -1,0 +1,128 @@
+/*--------------------------------------------------------------
+  5. Slider
+----------------------------------------------------------------*/
+
+.cs_slider {
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  overflow: hidden;
+  list-style: none;
+  padding: 0;
+  z-index: 1;
+}
+
+.cs_swiper_navigation.cs_style_1 {
+  display: flex;
+  justify-content: center;
+  margin-top: 60px;
+  @media (max-width: 991px) {
+    margin-top: 40px;
+  }
+  > * {
+    position: relative;
+    transition: all 0.4s ease;
+    &:hover {
+      color: $accent;
+    }
+    &:not(:last-child) {
+      padding-right: 25px;
+      margin-right: 25px;
+      border-right: 1px solid $secondary;
+    }
+  }
+}
+
+.cs_pagination.cs_style_1 {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 50px;
+  @media (max-width: 991px) {
+    margin-top: 30px;
+  }
+  .swiper-pagination-bullet {
+    height: 10px;
+    width: 10px;
+    background-color: $secondary;
+    opacity: 1;
+    border-radius: 1.6em;
+    transition: all 0.4s ease;
+    &.swiper-pagination-bullet-active {
+      width: 25px;
+    }
+  }
+}
+.swiper-pagination-bullets.cs_number_pagination {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: initial;
+  right: calc((100vw - 1420px) / 2 / 2);
+  width: initial;
+  @media (max-width: 1500px) {
+    right: calc((100vw - 1380px) / 2 / 2);
+    gap: 20px;
+    &.cs_fs_29 {
+      font-size: 20px;
+    }
+  }
+  @media (max-width: 1400px) {
+    right: calc((100vw - 1200px) / 2 / 2);
+  }
+  @media (max-width: 1199px) {
+    right: calc((100vw - 1020px) / 2 / 2);
+  }
+  @media (max-width: 1050px) {
+    position: initial;
+    flex-direction: revert;
+    align-items: center;
+    justify-content: center;
+    transform: initial;
+    margin-top: 30px;
+    gap: 15px;
+  }
+  .swiper-pagination-bullet {
+    height: 60px;
+    width: 60px !important;
+    flex: none;
+    width: initial;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: transparent;
+    border: 2px solid $gray2;
+    color: $gray2;
+    transition: all 0.4s ease;
+    opacity: 1;
+    margin: 0 !important;
+    @media (max-width: 1500px) {
+      height: 40px;
+      width: 40px !important;
+    }
+
+    &:hover,
+    &.swiper-pagination-bullet-active {
+      border-color: $secondary;
+      color: $secondary;
+    }
+  }
+}
+.swiper-slide {
+  .cs_portfolio.cs_style_2 .cs_portfolio_text {
+    left: 160px;
+    opacity: 0;
+    transition: all 0.8s ease;
+    transition-delay: 0.5s;
+  }
+  &.swiper-slide-active {
+    .cs_portfolio.cs_style_2 .cs_portfolio_text {
+      left: 0px;
+      opacity: 1;
+    }
+  }
+}

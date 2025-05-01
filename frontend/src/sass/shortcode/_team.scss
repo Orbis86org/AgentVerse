@@ -1,0 +1,20 @@
+/*--------------------------------------------------------------
+  20. Team
+----------------------------------------------------------------*/
+.cs_team.cs_style_1 {
+  @media (max-width: 575px) {
+    text-align: center;
+  }
+  .cs_team_info {
+    padding: 28px 30px 0;
+    @media (max-width: 991px) {
+      padding: 15px 0px 0;
+    }
+    h2 {
+      margin-bottom: 5px;
+      @media (max-width: 991px) {
+        margin-bottom: 2px;
+      }
+    }
+  }
+}

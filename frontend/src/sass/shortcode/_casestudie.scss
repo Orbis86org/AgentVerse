@@ -1,0 +1,106 @@
+/*--------------------------------------------------------------
+  19. Casestudie
+----------------------------------------------------------------*/
+.cs_case_study_1_list {
+  display: flex;
+  @media (max-width: 767px) {
+    flex-direction: column;
+  }
+  > .cs_case_study.cs_style_1 {
+    flex: 1;
+  }
+  .cs_case_study.cs_style_1 {
+    min-height: 400px;
+    .cs_case_study_in {
+      transition: all 0.2s ease;
+      left: 80px;
+      opacity: 0;
+      @media (max-width: 767px) {
+        left: 0;
+        opacity: 1;
+      }
+    }
+    &.active {
+      flex: 3;
+      .cs_case_study_in {
+        opacity: 1;
+        left: 0;
+        transition: all 0.6s ease;
+        transition-delay: 0.3s;
+      }
+      .cs_case_study_icon {
+        transform: scale(0) rotate(360deg);
+        transition-delay: 0.1s;
+      }
+    }
+  }
+}
+.cs_case_study.cs_style_1 {
+  height: 700px;
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  @media (max-width: 1400px) {
+    height: 600px;
+  }
+  .cs_case_study_title {
+    a {
+      text-decoration: none;
+      background-image: linear-gradient(currentColor, currentColor);
+      background-repeat: no-repeat;
+      background-position: bottom left;
+      background-size: 100% 3px;
+    }
+  }
+  .cs_case_study_number {
+    left: 70px;
+    top: 70px;
+    z-index: 1;
+    @media (max-width: 767px) {
+      left: 30px;
+      top: 40px;
+    }
+  }
+  .cs_case_study_category {
+    margin-bottom: 15px;
+  }
+  .cs_case_study_thumb {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+  }
+  .cs_case_study_in {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding: 88px 72px;
+    @media (max-width: 1400px) {
+      padding: 50px;
+    }
+    @media (max-width: 767px) {
+      padding: 30px;
+    }
+  }
+  .cs_case_study_icon {
+    left: 70px;
+    bottom: 86px;
+    z-index: 1;
+    background-color: $secondary;
+    color: #fff;
+    height: 55px;
+    width: 55px;
+    font-size: 20px;
+    transition: all 0.6s ease;
+    @media (max-width: 1400px) {
+      left: 40px;
+      bottom: 50px;
+    }
+    @media (max-width: 767px) {
+      display: none;
+    }
+  }
+}

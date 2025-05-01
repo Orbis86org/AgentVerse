@@ -1,0 +1,134 @@
+/*--------------------------------------------------------------
+  14. CTA
+----------------------------------------------------------------*/
+.cs_cta.cs_style_1 {
+  padding: 86px 180px 100px;
+  .cs_cta_shape_1 {
+    position: absolute;
+    left: 3%;
+    bottom: 12%;
+    animation: animo-x 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  .cs_cta_shape_2 {
+    position: absolute;
+    right: 4%;
+    top: 8%;
+    animation: animo-y 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  .cs_cta_in {
+    z-index: 1;
+  }
+  @media (max-width: 1400px) {
+    padding: 86px 100px 100px;
+  }
+  @media (max-width: 991px) {
+    padding: 70px 30px 80px;
+  }
+}
+.cs_cta.cs_style_2 {
+  .cs_cta_title {
+    color: transparent;
+    -webkit-text-stroke: 2px #121212;
+    max-width: 1050px;
+    margin-bottom: 78px;
+  }
+  .cs_cta_in {
+    display: flex;
+  }
+  .cs_cta_left {
+    flex: none;
+    width: 35%;
+    text-align: center;
+    padding-top: 15px;
+    @media (max-width: 575px) {
+      width: 30%;
+      svg {
+        width: 70px;
+        height: 70px;
+      }
+    }
+    @media (max-width: 340px) {
+      display: none;
+    }
+  }
+  .cs_cta_right {
+    flex: none;
+    max-width: 650px;
+    width: 65%;
+    @media (max-width: 575px) {
+      width: 70%;
+    }
+    @media (max-width: 340px) {
+      width: 100%;
+    }
+  }
+  .cs_cta_subtitle {
+    margin-bottom: 42px;
+  }
+  .cs_cta_icon {
+    svg {
+      animation: heroShapeAnim 20s linear infinite alternate;
+    }
+  }
+}
+.cs_cta.cs_style_3 {
+  .cs_cta_title {
+    span {
+      display: inline-block;
+      position: relative;
+    }
+    svg {
+      position: absolute;
+      right: -95px;
+      top: -55px;
+    }
+    @media (max-width: 767px) {
+      br {
+        display: none;
+      }
+    }
+  }
+}
+.cs_cta.cs_style_4 {
+  background-color: #0c0c0c;
+  padding: 127px 0 130px;
+  @media (max-width: 991px) {
+    padding: 80px 0 80px;
+  }
+  .container {
+    position: relative;
+    z-index: 2;
+  }
+  .cs_btn.cs_style_1 {
+    background-color: $accent;
+  }
+  .cs_cta_shape_1 {
+    top: 21%;
+    left: 14%;
+    animation: semi-rotate-anim 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    @media (max-width: 991px) {
+      display: none;
+    }
+  }
+  .cs_cta_shape_2 {
+    top: 66%;
+    right: 14%;
+    animation: semi-rotate-anim 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    @media (max-width: 991px) {
+      display: none;
+    }
+  }
+  .cs_cta_title {
+    color: #fff;
+    margin-bottom: 22px;
+    span {
+      color: transparent;
+      display: inline-block;
+      -webkit-text-stroke: 2px #fff;
+    }
+  }
+  .cs_cta_subtitle {
+    margin-bottom: 36px;
+    color: #a3a3a3;
+  }
+}

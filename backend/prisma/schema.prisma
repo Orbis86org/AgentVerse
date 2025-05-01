@@ -1,0 +1,157 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int              @id @default(autoincrement())
+  name           String?          @map("name")
+  email          String?          @map("email")
+  walletAddress  String           @unique @map("wallet_address")
+  credits Decimal @db.Decimal(18, 4) @default(0)
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+  deletedAt      DateTime?        @map("deleted_at")
+  Agent          Agent[]
+  CreditTransaction CreditTransaction[]
+
+  @@map("users")
+}
+
+model Agent {
+  id          Int    @id @default(autoincrement())
+  name        String
+  slug        String @unique
+  description String  @db.LongText
+
+  purpose         String  @db.LongText // e.g., "Content Writing", "Data Analysis"
+  model           String // e.g., "gpt-4", "custom-embedding"
+  instructions    String  @db.LongText
+
+  network          String
+  accountId String @map("account_id")
+  inboundTopicId String @map("inbound_topic_id")
+  outboundTopicId String @map("outbound_topic_id")
+  profileTopicId String @map("profile_topic_id")
+  privateKeyEncrypted String? @db.LongText @map("private_key")
+
+  // endpoint       String?   // URL or identifier for API interaction
+  creditsPerTask Int     @default(1) @map("credits_per_task")
+  imageUrl       String? @map("image_url") // Optional profile image for marketplace UI
+  walletAddress  String @map("wallet_address")// Agent creator’s Hedera wallet
+
+  // Optional relations if you add more models
+  owner User? @relation(fields: [walletAddress], references: [walletAddress])
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  tags        AgentTag[] // One-to-many relation
+  ChatHistory ChatHistory[]
+
+  @@map("agents")
+  AgentFeedback AgentFeedback[]
+  AgentRating AgentRating[]
+  CreditTransaction CreditTransaction[]
+}
+
+model AgentTag {
+  id      Int    @id @default(autoincrement())
+  value   String
+  agentId Int
+  agent   Agent  @relation(fields: [agentId], references: [id])
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@unique([agentId, value]) // Prevent duplicate tags for the same agent
+  @@map("agent_tags")
+}
+
+model ChatHistory {
+  id            Int       @id @default(autoincrement())
+  agent         Agent     @relation(fields: [agentId], references: [id])
+  agentId       Int
+  walletAddress String    @map("wallet_address")
+  messages      Json // Stored as JSON array
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+
+  ChatMessage ChatMessage[]
+
+  @@map("agent_chat_history")
+}
+
+model AgentFeedback {
+  id            Int       @id @default(autoincrement())
+  agentId       Int
+  walletAddress String    @map("wallet_address")
+  rating        Int       // Like 1 to 5 stars
+  comment       String?   @db.LongText // Optional comment (optional field)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+
+  agent         Agent     @relation(fields: [agentId], references: [id])
+
+  @@map("agent_feedback")
+}
+
+
+model ChatMessage {
+  id            String      @id
+  chatHistoryId Int @map("chat_history_id")
+  role          String @db.LongText
+  content       String @db.LongText
+  timestamp     DateTime
+  chatHistory   ChatHistory @relation(fields: [chatHistoryId], references: [id])
+
+  @@map("agent_chat_messages")
+}
+
+model CreditTransaction {
+  id            Int      @id @default(autoincrement())
+  walletAddress String   @map("wallet_address")
+  credits Decimal @db.Decimal(18, 4) @default(0)
+  network       String   @default("testnet")
+  txHash        String?  @unique @map("transaction_hash") // Nullable for revenue events
+  agentId       Int?
+  type          String    @default("purchase") // purchase, usage, revenue_share
+  createdAt     DateTime @default(now())
+
+  user  User   @relation(fields: [walletAddress], references: [walletAddress])
+  agent Agent? @relation(fields: [agentId], references: [id])
+
+  @@map("credit_transactions")
+}
+
+
+
+model AgentRating {
+  id            Int       @id @default(autoincrement())
+  agentId       Int
+  walletAddress String
+  rating        Int
+  comment       String?    @db.LongText
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  agent Agent @relation(fields: [agentId], references: [id])
+
+  @@unique([agentId, walletAddress])
+  @@map("agent_ratings")
+}

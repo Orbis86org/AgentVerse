@@ -1,0 +1,171 @@
+/*--------------------------------------------------------------
+  22. Pricing
+----------------------------------------------------------------*/
+.cs_pricing_control {
+  list-style: none;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.6em;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 50px;
+  color: $primary;
+  @media (max-width: 991px) {
+    margin-bottom: 30px;
+  }
+  li {
+    display: flex;
+    align-items: center;
+    position: relative;
+    &:last-child {
+      a {
+        &::before {
+          left: initial;
+          right: 100%;
+        }
+      }
+    }
+  }
+  .cs_switch {
+    display: inline-block;
+    position: relative;
+    height: 28px;
+    width: 60px;
+    background: $primary;
+    border-radius: 1.6em;
+    margin: 0 15px;
+    &::before {
+      content: '';
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background-color: #fff;
+      top: 4px;
+      left: 36px;
+      position: absolute;
+      transition: all 0.4s ease;
+    }
+  }
+  .cs_offer_shape {
+    display: flex;
+    position: absolute;
+    right: -70px;
+    bottom: 39px;
+  }
+  .active {
+    .cs_switch {
+      &::before {
+        left: 4px;
+      }
+    }
+  }
+  a {
+    position: relative;
+    &::before {
+      content: '';
+      height: 24px;
+      width: 50px;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 100%;
+      z-index: 1;
+    }
+  }
+  .cs_offer_label {
+    font-size: 12px;
+    line-height: 1.6em;
+    background-color: #666;
+    color: #fff;
+    border-radius: 15px;
+    padding: 3px 10px;
+    position: absolute;
+    white-space: nowrap;
+    bottom: 36px;
+  }
+}
+.cs_pricing_table.cs_style1 {
+  position: relative;
+  background: linear-gradient(267.18deg, #161616 0%, #080808 100%);
+  overflow: hidden;
+  padding: 32px 40px 40px;
+  @media (max-width: 1199px) {
+    padding: 32px 25px 40px;
+    .cs_fs_21 {
+      font-size: 18px;
+    }
+  }
+  &::before {
+    content: '';
+    position: absolute;
+    right: -55px;
+    top: -55px;
+    height: 135px;
+    width: 135px;
+    background: $accent;
+    filter: blur(125px);
+    transition: all 0.4s ease;
+    opacity: 0;
+  }
+  .cs_pricing_title {
+    color: #fff;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    span {
+      border: 1px solid #ddd;
+      border-radius: 15px;
+      font-size: 16px;
+      font-weight: 400;
+      padding: 1px 13px;
+      display: inline-flex;
+      line-height: 1.6em;
+      color: #ddd;
+    }
+  }
+  .cs_pricing_feature {
+    color: #fff;
+  }
+  .cs_price {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 18px;
+    h3 {
+      margin: 0;
+    }
+    span {
+      position: relative;
+      bottom: 9px;
+      margin-left: 18px;
+    }
+  }
+  .cs_pricing_info {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    padding-bottom: 37px;
+  }
+  .cs_pricing_feature {
+    padding: 40px 0;
+    li {
+      position: relative;
+      padding-left: 45px;
+      &:not(:last-child) {
+        margin-bottom: 23px;
+      }
+    }
+    .cs_feature_icon {
+      position: absolute;
+      left: 0;
+      top: -2px;
+    }
+  }
+  &:hover {
+    &::before {
+      opacity: 1;
+    }
+  }
+  .cs_btn.cs_style_1 {
+    width: 100%;
+    color: #fff;
+  }
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "title": "AI Agent",
+    "productThumb": "/images/agents/agent.png",
+    "price": 50
+  },
+  {
+    "id": 2,
+    "title": "AI Agent",
+    "productThumb": "/images/agents/agent.png",
+    "price": 50
+  },
+  {
+    "id": 3,
+    "title": "AI Agent",
+    "productThumb": "/images/agents/agent.png",
+    "price": 50
+  },
+  {
+    "id": 4,
+    "title": "AI Agent",
+    "productThumb": "/images/agents/agent.png",
+    "price": 50
+  },
+  {
+    "id": 5,
+    "title": "AI Agent",
+    "productThumb": "/images/agents/agent.png",
+    "price": 50
+  },
+  {
+    "id": 6,
+    "title": "AI Agent",
+    "productThumb": "/images/agents/agent.png",
+    "price": 50
+  },
+  {
+    "id": 7,
+    "title": "AI Agent",
+    "productThumb": "/images/agents/agent.png",
+    "price": 50
+  },
+  {
+    "id": 8,
+    "title": "AI Agent",
+    "productThumb": "/images/agents/agent.png",
+    "price": 50
+  },
+  {
+    "id": 9,
+    "title": "AI Agent",
+    "productThumb": "/images/agents/agent.png",
+    "price": 50
+  }
+]
