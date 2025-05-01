@@ -104,8 +104,8 @@ export default function Home() {
           'Connecting Users to the Next Generation of AI'
         ]}
         subtitle="Discover & Deploy AI Agents That Work for You"
-        videoSrc="https://www.youtube.com/embed/VcaAVWtP48A"
-        bgUrl="/images/creative-agency/hero_video_bg_1.png"
+        videoSrc="https://www.youtube.com/embed/l7MWCfkKYo4"
+        bgUrl="/images/video-thumbnail.jpg"
         hint="Learn how AgentVerse works"
       />
       <Spacing lg="125" md="70" />
