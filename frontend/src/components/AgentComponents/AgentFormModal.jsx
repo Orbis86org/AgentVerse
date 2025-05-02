@@ -10,7 +10,7 @@ export default function AgentFormModal({ show, onClose, onRefresh, editAgent }) 
         slug: '',
         description: '',
         purpose: '',
-        model: 'gpt-4',
+        model: 'gpt-4o-mini',
         instructions: '',
         creditsPerTask: 1,
         imageUrl: '',
@@ -30,7 +30,7 @@ export default function AgentFormModal({ show, onClose, onRefresh, editAgent }) 
                 slug: editAgent.slug ?? '',
                 description: editAgent.description ?? '',
                 purpose: editAgent.purpose ?? '',
-                model: editAgent.model ?? 'gpt-4',
+                model: editAgent.model ?? 'gpt-4o-mini',
                 instructions: editAgent.instructions ?? '',
                 creditsPerTask: editAgent.creditsPerTask ?? 1,
                 imageUrl: editAgent.imageUrl ?? '',
@@ -49,7 +49,7 @@ export default function AgentFormModal({ show, onClose, onRefresh, editAgent }) 
     const resetForm = () => {
         setFormData({
             name: '', slug: '', description: '', purpose: '',
-            model: 'gpt-4', instructions: '', creditsPerTask: 1,
+            model: 'gpt-4o-mini', instructions: '', creditsPerTask: 1,
             imageUrl: '', network: 'testnet', apiKey: '', tags: '',
         });
         setSlugValid(null);
@@ -196,8 +196,9 @@ export default function AgentFormModal({ show, onClose, onRefresh, editAgent }) 
                                     onChange={handleChange}
                                     required
                                 >
-                                    <option style={{ color: '#000' }} value="gpt-4o">gpt-4o</option>
-                                    <option style={{ color: '#000' }} value="dall-e">dall-e</option>
+                                    <option style={{color: '#000'}} value="gpt-4o-mini">gpt-4o-mini</option>
+                                    <option style={{color: '#000'}} value="gpt-4o">gpt-4o</option>
+                                    <option style={{color: '#000'}} value="dall-e">dall-e</option>
                                 </select>
                             </div>
 

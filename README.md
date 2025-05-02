@@ -15,7 +15,7 @@
 
 ---
 
-[![Watch the demo](https://img.youtube.com/vi/l7MWCfkKYo4/maxresdefault.jpg)](https://www.youtube.com/watch?v=l7MWCfkKYo4)
+[![Watch the demo](https://img.youtube.com/vi/xgFdDBX_1qM/maxresdefault.jpg)](https://www.youtube.com/watch?v=xgFdDBX_1qM)
 
 ---
 
@@ -66,6 +66,7 @@ npm run build
 ```bash
 cd backend
 npm install
+npx tsx src/bot-runners/run-agent.ts # Run bot runner
 ```
 
 ### Environment Variables

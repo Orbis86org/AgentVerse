@@ -9,11 +9,21 @@ import {HCS10Client} from "@hashgraphonline/standards-sdk";
 import ConnectionManager from '../utils/ConnectionManager.js';
 import MessageMonitor from '../utils/MessageMonitor.js';
 import {createAgentExecutorFromDb} from "../utils/createAgentExecutor.js";
+import {decryptMessage, encryptMessage} from "../utils/Encryption.js";
 
 const prisma = new PrismaClient();
 
 async function run() {
     console.log('🟢 Starting bot agent listener...');
+
+    const activeConnections = new Map<string, string>(); // accountId -> topicId
+
+    // Clean up old connections every 10 minutes
+    setInterval(() => {
+        activeConnections.clear();
+        console.log('Clear stale activeConnections cache');
+    }, 10 * 60 * 1000);
+
 
     /**
      * Example usage of the connection manager
@@ -30,9 +40,21 @@ async function run() {
 
         // Listen for new connections
         manager.on('connection', (connection) => {
+            const accountId = connection.targetAccountId;
+
+            // Skip if already connected
+            if (activeConnections.has(accountId)) {
+                console.log(`🔁 Duplicate connection for ${accountId}`);
+
+                // return;
+            }
+
             console.log(
                 `New connection established: ${connection.id} to ${connection.targetAccountId}`
             );
+
+            activeConnections.set(accountId, connection.topicId);
+
 
             // Set up message monitoring for this connection
             setupMessageMonitoring(client, connection.topicId, connection.id);
@@ -84,20 +106,18 @@ async function run() {
                 console.warn('Unexpected message.data type:', typeof message.data);
             }
 
+            console.info('Message Data: ', data )
+
             const type = data.type;
             const question = data.question;
-            const canHandle = data?.parameters?.canHandle || null;
             const agent = data?.parameters?.agent;
 
-            /**
-             * If this is a canHandle request, where the query asks a bot if it can do a specific task, we ask the bot,
-             * and it should return in very simple terms: either yes or no.
-             */
-            if( type == 'query' && canHandle === true ){
+
+            if( type == 'query' && agent ){
                 // Talk to agent
                 const agentExecutor = await createAgentExecutorFromDb(agent);
 
-                const input = `Provide a plain "Yes" or "No" response to this query: Can do this: ${question}?`
+                const input = decryptMessage( question );
 
                 const result = await agentExecutor.invoke({ input });
 
@@ -105,29 +125,20 @@ async function run() {
 
                 console.log( 'Agent Response: ', output)
 
-                const canHandle = output.includes('yes') || output.includes('Yes') || output.includes('YES');
-
                 // Send a response
                 await client.sendMessage(
                     topicId,
                     JSON.stringify({
                         type: 'response',
-                        canHandle: canHandle,
-                        replyTo: data.question
+                        requestId: data.requestId,
+                        replyTo: data.question,
+                        response: encryptMessage( output )
                     })
                 );
 
                 return;
             }
 
-            // Send a response
-            await client.sendMessage(
-                topicId,
-                JSON.stringify({
-                    type: 'echo',
-                    original: message.data
-                })
-            );
 
         });
 

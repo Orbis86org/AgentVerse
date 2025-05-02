@@ -1,5 +1,5 @@
 {
-  "name": "hedera-langchain-backend",
+  "name": "agentverse-backend",
   "version": "1.0.0",
   "type": "module",
   "main": "server.ts",

@@ -24,7 +24,7 @@ export async function createAgentExecutorFromDb(agent: PrismaAgent): Promise<Age
 
     const llm = new ChatOpenAI({
         apiKey: process.env.OPENAI_API_KEY!,
-        modelName: "gpt-4o", // Always a CHAT model
+        modelName: "gpt-4o", // Chat model for text communication
         temperature: 0,
     });
 
