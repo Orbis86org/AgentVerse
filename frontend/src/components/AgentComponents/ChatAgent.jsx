@@ -56,7 +56,8 @@ export default function ChatAgent({ agentSlug, walletAddress }) {
         setLoading(true);
 
         try {
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/chat`, {
+            const url = `${process.env.REACT_APP_BACKEND_URL}/api/chat-hcs`;
+            const res = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ input: content, agentSlug, walletAddress }),
