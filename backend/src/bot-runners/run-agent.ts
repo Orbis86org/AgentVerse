@@ -40,13 +40,15 @@ async function run() {
 
         // Listen for new connections
         manager.on('connection', async (connection) => {
+
             const accountId = connection.targetAccountId;
 
             // Skip if already connected
             if (activeConnections.has(accountId)) {
                 console.log(`🔁 Duplicate connection for ${accountId}`);
+                console.log('Connection: ', connection)
 
-                // return;
+                return;
             }
 
             console.log(
@@ -105,7 +107,7 @@ async function run() {
                 console.warn('Unexpected message.data type:', typeof message.data);
             }
 
-            console.info('Message Data: ', data )
+            // console.info('Message Data: ', data )
 
             const type = data.type;
             const question = data.question;
@@ -117,6 +119,8 @@ async function run() {
                 const agentExecutor = await createAgentExecutorFromDb(agent);
 
                 const input = decryptMessage( question );
+
+                console.log('Agent Question: ', input )
 
                 const result = await agentExecutor.invoke({ input });
 

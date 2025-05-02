@@ -1,130 +1,99 @@
+// utils/MessageMonitor.ts
 import { EventEmitter } from 'events';
-import {HCS10Client, Logger} from "@hashgraphonline/standards-sdk";
-import connectionManager from "./ConnectionManager.js";
+import { HCS10Client, Logger } from '@hashgraphonline/standards-sdk';
+import { loadLastSequenceNumber, saveLastSequenceNumber } from './SequenceTracker.js';
 
-/**
- * Message Monitor for real-time message processing
- */
 class MessageMonitor extends EventEmitter {
     private client: HCS10Client;
     private topicId: string;
-    private running: boolean = false;
-    private lastProcessedTimestamp: number = 0;
+    private running = false;
+    private lastProcessedSequenceNumber: number;
+    private pollInterval = 3000;
     private Logger = Logger.getInstance({ module: 'MessageMonitor' });
-    private pollInterval: number = 3000;
 
     constructor(client: HCS10Client, topicId: string) {
         super();
         this.client = client;
         this.topicId = topicId;
+        this.lastProcessedSequenceNumber = loadLastSequenceNumber(topicId);
     }
 
-    /**
-     * Start monitoring for messages
-     */
     start(): MessageMonitor {
         if (this.running) return this;
 
         this.running = true;
         this.Logger.info(`Starting message monitor for topic ${this.topicId}`);
-
         this.poll();
         return this;
     }
 
-    /**
-     * Stop monitoring
-     */
     stop(): void {
         this.running = false;
         this.Logger.info(`Stopped message monitor for topic ${this.topicId}`);
     }
 
-    /**
-     * Set the polling interval
-     */
     setPollInterval(ms: number): MessageMonitor {
         this.pollInterval = ms;
         return this;
     }
 
-    /**
-     * Set the last processed timestamp
-     */
-    setLastProcessedTimestamp(timestamp: number): MessageMonitor {
-        this.lastProcessedTimestamp = timestamp;
+    setLastProcessedSequenceNumber(sequenceNumber: number): MessageMonitor {
+        this.lastProcessedSequenceNumber = sequenceNumber;
         return this;
     }
 
-    /**
-     * Poll for new messages
-     */
     private async poll(): Promise<void> {
         if (!this.running) return;
 
         try {
             const { messages } = await this.client.getMessages(this.topicId);
 
-            // Filter for new messages
-            const newMessages = messages.filter(
-                (msg) => msg.consensus_timestamp > this.lastProcessedTimestamp
-            ).sort((a, b) => a.consensus_timestamp - b.consensus_timestamp);
+            const newMessages = messages
+                .filter((msg) => msg.sequence_number > this.lastProcessedSequenceNumber)
+                .sort((a, b) => a.sequence_number - b.sequence_number);
 
-            // Process new messages
             for (const message of newMessages) {
                 if (message.op === 'message') {
                     const processedMessage = await this.processMessage(message);
-
-                    if (!processedMessage) continue; // Skip failed ones
+                    if (!processedMessage) continue;
 
                     this.emit('message', processedMessage);
                 }
 
-                // Update last processed timestamp
-                this.lastProcessedTimestamp = Math.max(
-                    this.lastProcessedTimestamp,
-                    message.consensus_timestamp
+                this.lastProcessedSequenceNumber = Math.max(
+                    this.lastProcessedSequenceNumber,
+                    message.sequence_number
                 );
+                saveLastSequenceNumber(this.topicId, this.lastProcessedSequenceNumber);
             }
         } catch (error) {
             this.Logger.error(`Error polling for messages: ${error}`);
             this.emit('error', error);
         }
 
-        // Schedule next poll if still running
         if (this.running) {
             setTimeout(() => this.poll(), this.pollInterval);
         }
     }
 
-    /**
-     * Process a raw message
-     */
     private async processMessage(message: any) {
         let data = message.data;
         let isHcs1Reference = false;
 
-        // Check if this is a large message reference (HCS-1)
         if (typeof data === 'string' && data.startsWith('hcs://1/')) {
             isHcs1Reference = true;
             this.Logger.debug(`Resolving large content reference: ${data}`);
 
             try {
-                // Retrieve the content from HCS-1
-                try {
-                    data = await this.client.getMessageContent(data);
-                } catch (error) {
-                    this.Logger.warn(`Skipping message ${message.sequence_number}: failed to resolve HRL: ${error.message}`);
-                    return null; // Skip
-                }
-
+                data = await this.client.getMessageContent(data);
             } catch (error) {
-                this.Logger.error(`Failed to resolve content reference: ${error}`);
-                throw error;
+                this.Logger.warn(
+                    `Skipping message ${message.sequence_number}: failed to resolve HRL: ${error.message}`
+                );
+                return null;
             }
         }
 
-        // Try to parse JSON content
         if (
             typeof data === 'string' &&
             (data.startsWith('{') || data.startsWith('['))
@@ -132,11 +101,10 @@ class MessageMonitor extends EventEmitter {
             try {
                 data = JSON.parse(data);
             } catch (e) {
-                // Not valid JSON, keep as string
+                // Keep as raw string
             }
         }
 
-        // Return processed message
         return {
             id: message.sequence_number,
             sender: message.operator_id,
@@ -152,62 +120,3 @@ class MessageMonitor extends EventEmitter {
 }
 
 export default MessageMonitor;
-
-/**
- * Start monitoring a connection and handle messages
- */
-function startMessageMonitoring(
-    client: HCS10Client,
-    connectionTopicId: string
-) {
-    const monitor = new MessageMonitor(client, connectionTopicId).start();
-
-    // Process different message types
-    monitor.on('message', (message) => {
-        const { id, sender, data } = message;
-
-        Logger.info(`Received message #${id} from ${sender}`);
-
-        // Handle based on message data
-        if (typeof data === 'object') {
-            // Handle structured data
-            const messageType = data.type || 'unknown';
-
-            switch (messageType) {
-                case 'query':
-                    handleQuery(data, sender, connectionTopicId);
-                    break;
-
-                case 'training_data':
-                    handleTrainingData(data, sender, connectionTopicId);
-                    break;
-
-                case 'close_connection':
-                    handleCloseRequest(data, sender, connectionTopicId);
-                    break;
-
-                default:
-                    Logger.info(`Received message with type: ${messageType}`);
-                // Handle other message types
-            }
-        } else {
-            // Handle plain text
-            Logger.info(`Text message: ${data}`);
-
-            // Echo back for demonstration
-            sendMessage(client, connectionTopicId, `Received your message: ${data}`);
-        }
-    });
-
-    // Handle monitor errors
-    monitor.on('error', async (error) => {
-        Logger.error(`Message monitor error for connection ${connectionId}:`, error);
-
-        if (error.message.includes('Failed to resolve HRL')) {
-            Logger.warn(`Closing connection ${connectionTopicId} due to unresolved HRL`);
-            await connectionManager.closeConnection(connectionTopicId, 'HRL reference could not be resolved');
-        }
-    });
-
-    return monitor;
-}

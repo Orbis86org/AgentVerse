@@ -43,27 +43,12 @@ export function getCachedConnection(agentAccountId: string, walletAddress: strin
     return cache[getConnectionKey(agentAccountId, walletAddress)] || null;
 }
 
-export function setCachedConnection(agentAccountId: string, walletAddress: string, topicId: string, requestId: number) {
-    const key = getConnectionKey(agentAccountId, walletAddress);
-    cache[key] = { topicId, requestId };
-    try {
-        fs.writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2));
-    } catch (err) {
-        console.error("Failed to write cache file:", err);
-    }
-}
-
-export function clearStaleConnections() {
-    cache = {};
-    fs.writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2));
-}
-
 export async function waitForAgentResponse(
     client: HCS10Client,
     connectionTopicId: string,
     requestId: number | string,
-    maxAttempts: number = 15,
-    delayMs: number = 2000
+    maxAttempts: number = 60,
+    delayMs: number = 5000
 ): Promise<any | null> {
     let attempts = 0;
     let lastSeenTimestamp = 0;
@@ -130,42 +115,25 @@ router.post("/chat-hcs", async (req, res) => {
         });
 
         const memo = input;
-        const cached = getCachedConnection(agent.accountId, walletAddress);
         let connectionTopicId: string;
         let requestId: number;
 
-        if (cached) {
-            connectionTopicId = cached.topicId;
-            requestId = cached.requestId;
-        } else {
-            const targetInboundTopicId = agent.inboundTopicId;
-            const result = await defaultAgentClient.submitConnectionRequest(targetInboundTopicId, memo);
-            requestId = result.topicSequenceNumber.toNumber();
+        const targetInboundTopicId = agent.inboundTopicId;
+        const result = await defaultAgentClient.submitConnectionRequest(targetInboundTopicId, memo);
+        requestId = result.topicSequenceNumber.toNumber();
 
-            console.log('Wait For Connection Confirmation: ', targetInboundTopicId,
-                requestId );
+        console.log('Wait For Connection Confirmation: ', targetInboundTopicId,
+            requestId );
 
-            const confirmation = await defaultAgentClient.waitForConnectionConfirmation(
-                targetInboundTopicId,
-                requestId,
-                60,
-                2000,
-                true
-            );
-
-            connectionTopicId = confirmation.connectionTopicId;
-            setCachedConnection(agent.accountId, walletAddress, connectionTopicId, requestId);
-        }
-
-        console.log( 'Data: ', {
-            type: "query",
-            question: input,
+        const confirmation = await defaultAgentClient.waitForConnectionConfirmation(
+            targetInboundTopicId,
             requestId,
-            parameters: {
-                agent,
-                walletAddress,
-            },
-        });
+            60,
+            2000,
+            true
+        );
+
+        connectionTopicId = confirmation.connectionTopicId;
 
         await defaultAgentClient.sendMessage(
             connectionTopicId,
