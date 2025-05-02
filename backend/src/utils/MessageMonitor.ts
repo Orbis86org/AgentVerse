@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events';
 import {HCS10Client, Logger} from "@hashgraphonline/standards-sdk";
+import connectionManager from "./ConnectionManager.js";
 
 /**
  * Message Monitor for real-time message processing
@@ -73,6 +74,9 @@ class MessageMonitor extends EventEmitter {
             for (const message of newMessages) {
                 if (message.op === 'message') {
                     const processedMessage = await this.processMessage(message);
+
+                    if (!processedMessage) continue; // Skip failed ones
+
                     this.emit('message', processedMessage);
                 }
 
@@ -107,7 +111,13 @@ class MessageMonitor extends EventEmitter {
 
             try {
                 // Retrieve the content from HCS-1
-                data = await this.client.getMessageContent(data);
+                try {
+                    data = await this.client.getMessageContent(data);
+                } catch (error) {
+                    this.Logger.warn(`Skipping message ${message.sequence_number}: failed to resolve HRL: ${error.message}`);
+                    return null; // Skip
+                }
+
             } catch (error) {
                 this.Logger.error(`Failed to resolve content reference: ${error}`);
                 throw error;
@@ -190,8 +200,13 @@ function startMessageMonitoring(
     });
 
     // Handle monitor errors
-    monitor.on('error', (error) => {
-        Logger.error(`Message monitor error: ${error}`);
+    monitor.on('error', async (error) => {
+        Logger.error(`Message monitor error for connection ${connectionId}:`, error);
+
+        if (error.message.includes('Failed to resolve HRL')) {
+            Logger.warn(`Closing connection ${connectionTopicId} due to unresolved HRL`);
+            await connectionManager.closeConnection(connectionTopicId, 'HRL reference could not be resolved');
+        }
     });
 
     return monitor;

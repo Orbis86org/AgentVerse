@@ -39,7 +39,7 @@ async function run() {
         ).startMonitoring();
 
         // Listen for new connections
-        manager.on('connection', (connection) => {
+        manager.on('connection', async (connection) => {
             const accountId = connection.targetAccountId;
 
             // Skip if already connected
@@ -54,7 +54,6 @@ async function run() {
             );
 
             activeConnections.set(accountId, connection.topicId);
-
 
             // Set up message monitoring for this connection
             setupMessageMonitoring(client, connection.topicId, connection.id);

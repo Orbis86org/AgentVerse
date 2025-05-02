@@ -4,59 +4,98 @@ import { getAgentExecutor } from '../agent';
 import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import {createAgentExecutorFromDb} from "../utils/createAgentExecutor.ts";
-import {HCS10Client} from "@hashgraphonline/standards-sdk";
-import {createAgentHCSHederaClient} from "../utils/HederaClient.js";
-import {decryptMessage, encryptMessage} from "../utils/Encryption.js";
+import { HCS10Client } from "@hashgraphonline/standards-sdk";
+import { createAgentHCSHederaClient } from "../utils/HederaClient.js";
+import { decryptMessage, encryptMessage } from "../utils/Encryption.js";
+import fs from "fs";
+import path from "path";
+import messageMonitor from "../utils/MessageMonitor.js";
+import connectionManager from "../utils/ConnectionManager.js";
+import express from "express";
+import { PrismaClient } from "@prisma/client";
+import crypto from "crypto";
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
+const CACHE_FILE = path.resolve("connection-cache.json");
+
+interface CachedConnection {
+    topicId: string;
+    requestId: number;
+}
+
+let cache: Record<string, CachedConnection> = {};
+
+if (fs.existsSync(CACHE_FILE)) {
+    try {
+        cache = JSON.parse(fs.readFileSync(CACHE_FILE, "utf-8"));
+    } catch (err) {
+        console.warn("Failed to load cache file:", err);
+    }
+}
+
+export function getConnectionKey(agentAccountId: string, walletAddress: string): string {
+    return `${agentAccountId}:${walletAddress}`;
+}
+
+export function getCachedConnection(agentAccountId: string, walletAddress: string): CachedConnection | null {
+    return cache[getConnectionKey(agentAccountId, walletAddress)] || null;
+}
+
+export function setCachedConnection(agentAccountId: string, walletAddress: string, topicId: string, requestId: number) {
+    const key = getConnectionKey(agentAccountId, walletAddress);
+    cache[key] = { topicId, requestId };
+    try {
+        fs.writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2));
+    } catch (err) {
+        console.error("Failed to write cache file:", err);
+    }
+}
+
+export function clearStaleConnections() {
+    cache = {};
+    fs.writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2));
+}
+
 export async function waitForAgentResponse(
     client: HCS10Client,
     connectionTopicId: string,
-    requestId: number,
+    requestId: number | string,
     maxAttempts: number = 15,
     delayMs: number = 2000
 ): Promise<any | null> {
     let attempts = 0;
-    let lastSeenTimestamp = 0; // Start at 0 to capture earliest messages
+    let lastSeenTimestamp = 0;
 
     while (attempts < maxAttempts) {
-        console.log('Running attempt: ', attempts);
+        console.log("Running attempt:", attempts);
         const { messages } = await client.getMessages(connectionTopicId);
 
-        console.log(messages);
-
         for (const message of messages) {
-            if (message.op !== 'message') continue;
+            if (message.op !== "message") continue;
 
             const consensusTs = Number(message.consensus_timestamp);
             if (consensusTs <= lastSeenTimestamp) continue;
 
-            console.log('ConsensusTs passed')
-
             let content = message.data;
-            if (typeof content === 'string') {
+            if (typeof content === "string") {
                 try {
                     content = await client.getMessageContent(content);
-
-                    console.log( 'Content: ', content);
                 } catch (err) {
-                    console.warn('Failed to fetch inscribed content:', err);
+                    console.warn("Failed to fetch inscribed content:", err);
                     continue;
                 }
             }
 
             let parsed;
             try {
-                parsed = typeof content === 'string' ? JSON.parse(content) : content;
+                parsed = typeof content === "string" ? JSON.parse(content) : content;
             } catch {
                 continue;
             }
 
-            console.log('Parsed Content: ', parsed )
-
-            if (parsed?.type === 'response' && parsed.requestId === requestId) {
+            if (parsed?.type === "response" && parsed.requestId === requestId) {
                 return parsed;
             }
 
@@ -67,9 +106,136 @@ export async function waitForAgentResponse(
         attempts++;
     }
 
-    return null; // No matching response received in time
+    return null;
 }
 
+router.post("/chat-hcs", async (req, res) => {
+    const { input, agentSlug, walletAddress } = req.body;
+
+    if (!input || !agentSlug || !walletAddress) {
+        return res.status(400).json({ error: "Missing input, agentSlug, or walletAddress" });
+    }
+
+    try {
+        const agent = await prisma.agent.findUnique({ where: { slug: agentSlug } });
+        if (!agent) return res.status(404).json({ error: "Agent not found" });
+
+        const defaultAgentClient = new HCS10Client({
+            network: process.env.HEDERA_NETWORK,
+            operatorId: process.env.TODD_ACCOUNT_ID,
+            operatorPrivateKey: process.env.TODD_PRIVATE_KEY,
+            logLevel: "info",
+            prettyPrint: true,
+            guardedRegistryBaseUrl: "https://moonscape.tech",
+        });
+
+        const memo = input;
+        const cached = getCachedConnection(agent.accountId, walletAddress);
+        let connectionTopicId: string;
+        let requestId: number;
+
+        if (cached) {
+            connectionTopicId = cached.topicId;
+            requestId = cached.requestId;
+        } else {
+            const targetInboundTopicId = agent.inboundTopicId;
+            const result = await defaultAgentClient.submitConnectionRequest(targetInboundTopicId, memo);
+            requestId = result.topicSequenceNumber.toNumber();
+
+            console.log('Wait For Connection Confirmation: ', targetInboundTopicId,
+                requestId );
+
+            const confirmation = await defaultAgentClient.waitForConnectionConfirmation(
+                targetInboundTopicId,
+                requestId,
+                60,
+                2000,
+                true
+            );
+
+            connectionTopicId = confirmation.connectionTopicId;
+            setCachedConnection(agent.accountId, walletAddress, connectionTopicId, requestId);
+        }
+
+        console.log( 'Data: ', {
+            type: "query",
+            question: input,
+            requestId,
+            parameters: {
+                agent,
+                walletAddress,
+            },
+        });
+
+        await defaultAgentClient.sendMessage(
+            connectionTopicId,
+            JSON.stringify({
+                type: "query",
+                question: encryptMessage(input),
+                requestId,
+                parameters: {
+                    agent,
+                    walletAddress,
+                },
+            })
+        );
+
+        const response = await waitForAgentResponse(defaultAgentClient, connectionTopicId, requestId);
+
+        let agent_response;
+
+        if (response) {
+            agent_response = decryptMessage(response.response);
+        } else {
+            agent_response = "No response received in time.";
+        }
+
+        const chatHistory = await prisma.chatHistory.create({
+            data: {
+                agentId: agent.id,
+                walletAddress,
+                messages: [],
+            },
+        });
+
+        const baseTimestamp = new Date();
+        const messagesToCreate = [];
+
+        if (agent.instructions) {
+            messagesToCreate.push({
+                id: crypto.randomUUID(),
+                chatHistoryId: chatHistory.id,
+                role: "system",
+                content: agent.instructions,
+                timestamp: baseTimestamp,
+            });
+        }
+
+        messagesToCreate.push(
+            {
+                id: crypto.randomUUID(),
+                chatHistoryId: chatHistory.id,
+                role: "user",
+                content: input,
+                timestamp: baseTimestamp,
+            },
+            {
+                id: crypto.randomUUID(),
+                chatHistoryId: chatHistory.id,
+                role: "assistant",
+                content: agent_response,
+                timestamp: new Date(),
+            }
+        );
+
+        await prisma.chatMessage.createMany({ data: messagesToCreate });
+
+        res.json({ output: agent_response });
+    } catch (error: any) {
+        console.error("HCS Chat Error:", error);
+        return res.status(500).json({ error: error.message });
+    }
+});
 
 
 // POST /chat
@@ -135,142 +301,6 @@ router.post('/chat', async (req, res) => {
     }
 });
 
-router.post('/chat-hcs', async (req, res) => {
-    const { input, agentSlug, walletAddress } = req.body;
-
-    if (!input || !agentSlug || !walletAddress) {
-        return res.status(400).json({ error: 'Missing input, agentSlug, or walletAddress' });
-    }
-
-    try {
-        const agent = await prisma.agent.findUnique({ where: { slug: agentSlug } });
-        if (!agent) return res.status(404).json({ error: 'Agent not found' });
-
-        /**
-         * Get default agent
-         */
-        const defaultAgentClient = new HCS10Client({
-            network: process.env.HEDERA_NETWORK, // Network: 'testnet' or 'mainnet'
-            operatorId: process.env.TODD_ACCOUNT_ID, // Your Hedera account ID
-            operatorPrivateKey: process.env.TODD_PRIVATE_KEY, // Your Hedera private key
-            logLevel: 'info', // Optional: 'debug', 'info', 'warn', 'error'
-            prettyPrint: true, // Optional: prettier console output
-            guardedRegistryBaseUrl: 'https://moonscape.tech', // Optional: registry URL
-            // feeAmount: 1, // Optional: default fee in HBAR
-        });
-
-        /**
-         * Connect to agent
-         */
-        // Prepare connection request
-        const targetInboundTopicId = agent.inboundTopicId; // Target agent's inbound topic
-        const memo = input;
-
-        // Submit connection request
-        const result = await defaultAgentClient.submitConnectionRequest(
-            targetInboundTopicId,
-            memo
-        );
-
-        // Get connection request ID
-        const requestId = result.topicSequenceNumber.toNumber();
-
-        // Wait for connection confirmation
-        const confirmation = await defaultAgentClient.waitForConnectionConfirmation(
-            targetInboundTopicId,
-            requestId,
-            60, // Maximum wait time (seconds)
-            2000, // Polling interval (milliseconds)
-            true // Optional: Record confirmation on outbound topic (default: true)
-        );
-
-        // Connection established - shared topic created
-        const connectionTopicId = confirmation.connectionTopicId;
-
-
-        console.log('Sending message to HCS-10 agent.........')
-        console.log( input );
-
-        await defaultAgentClient.sendMessage(
-            connectionTopicId,
-            JSON.stringify({
-                type: 'query',
-                question: encryptMessage( input ),
-                requestId: requestId,
-                parameters: {
-                    agent: agent,
-                    walletAddress: walletAddress,
-                },
-            })
-        );
-
-
-        const response = await waitForAgentResponse(
-            defaultAgentClient,
-            connectionTopicId,
-            requestId
-        );
-
-        let agent_response;
-
-        if (response) {
-            console.log('Agent replied:', response.response);
-
-            agent_response = decryptMessage( response.response );
-        } else {
-            console.warn('No response received in time.');
-
-            agent_response = 'No response received in time.';
-        }
-
-        const chatHistory = await prisma.chatHistory.create({
-            data: {
-                agentId: agent.id,
-                walletAddress,
-                messages: [],
-            },
-        });
-
-        const baseTimestamp = new Date();
-        const messagesToCreate = [];
-
-        if (agent.instructions) {
-            messagesToCreate.push({
-                id: crypto.randomUUID(),
-                chatHistoryId: chatHistory.id,
-                role: 'system',
-                content: agent.instructions,
-                timestamp: baseTimestamp,
-            });
-        }
-
-
-        messagesToCreate.push(
-            {
-                id: crypto.randomUUID(),
-                chatHistoryId: chatHistory.id,
-                role: 'user',
-                content: input,
-                timestamp: baseTimestamp,
-            },
-            {
-                id: crypto.randomUUID(),
-                chatHistoryId: chatHistory.id,
-                role: 'assistant',
-                content: agent_response,
-                timestamp: new Date(),
-            }
-        );
-
-        await prisma.chatMessage.createMany({ data: messagesToCreate });
-
-        res.json({ output: agent_response });
-
-    }catch (error: any) {
-        console.error('HCS Chat Error:', error);
-        return res.status(500).json({ error: error.message });
-    }
-});
 
 // POST /chat/history/:slug
 router.get('/chat/history/:slug', async (req, res) => {

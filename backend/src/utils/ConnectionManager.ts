@@ -3,37 +3,35 @@ import { EventEmitter } from 'events';
 import { Logger } from '@hashgraphonline/standards-sdk';
 
 /**
- * Connection Manager to handle multiple connections
+ * Connection Manager to handle multiple connections (no new topic creation)
  */
 class ConnectionManager extends EventEmitter {
     private client: HCS10Client;
     private inboundTopicId: string;
-    private connections: Map<string, {
+    private connections = new Map<string, {
         connectionTopicId: string;
         targetAccountId: string;
         isActive: boolean;
         lastActivity: number;
         metadata?: any;
-    }> = new Map();
-
+    }>();
     private monitoring = false;
-    private polling = false;
-    private logger = Logger.getInstance({ module: 'ConnectionManager' });
     private lastProcessedMessage = 0;
-    private pollInterval: number;
+    private pollInterval = 3000;
+    private logger = Logger.getInstance({ module: 'ConnectionManager' });
 
-    constructor(client: HCS10Client, inboundTopicId: string, pollInterval: number = 1000) {
+    constructor(client: HCS10Client, inboundTopicId: string) {
         super();
         this.client = client;
         this.inboundTopicId = inboundTopicId;
-        this.pollInterval = pollInterval;
     }
 
     startMonitoring(): ConnectionManager {
         if (this.monitoring) return this;
+
         this.monitoring = true;
         this.logger.info(`Starting connection monitoring for ${this.inboundTopicId}`);
-        setInterval(() => this.monitorInboundTopic(), this.pollInterval);
+        this.monitorInboundTopic();
         return this;
     }
 
@@ -42,10 +40,14 @@ class ConnectionManager extends EventEmitter {
         this.logger.info('Connection monitoring stopped');
     }
 
-    getConnections(): Array<{ id: string; topicId: string; targetAccountId: string; }> {
-        return Array.from(this.connections.entries())
-            .filter(([_, conn]) => conn.isActive)
-            .map(([id, conn]) => ({ id, topicId: conn.connectionTopicId, targetAccountId: conn.targetAccountId }));
+    getConnections(): Array<{ id: string; topicId: string; targetAccountId: string }> {
+        const result = [];
+        this.connections.forEach((conn, id) => {
+            if (conn.isActive) {
+                result.push({ id, topicId: conn.connectionTopicId, targetAccountId: conn.targetAccountId });
+            }
+        });
+        return result;
     }
 
     getConnection(connectionId: string): any {
@@ -59,59 +61,27 @@ class ConnectionManager extends EventEmitter {
         return null;
     }
 
-    async initiateConnection(targetInboundTopicId: string, memo: string = 'Connection request'): Promise<any> {
-        try {
-            this.logger.info(`Initiating connection to ${targetInboundTopicId}`);
-            const result = await this.client.submitConnectionRequest(targetInboundTopicId, memo);
-            const requestId = result.topicSequenceNumber.toNumber();
-
-            const confirmation = await this.client.waitForConnectionConfirmation(targetInboundTopicId, requestId, 60, 2000);
-            const connectionTopicId = confirmation.connectionTopicId;
-            const targetAccountId = confirmation.targetAccountId;
-
-            const connectionId = `conn-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-            this.connections.set(connectionId, {
-                connectionTopicId,
-                targetAccountId,
-                isActive: true,
-                lastActivity: Date.now(),
-                metadata: { initiator: true, created: new Date().toISOString(), requestId }
-            });
-
-            this.logger.info(`Connection established: ${connectionId} -> ${connectionTopicId}`);
-            this.emit('connection', { id: connectionId, topicId: connectionTopicId, targetAccountId });
-
-            return { connectionId, connectionTopicId, targetAccountId };
-        } catch (error) {
-            this.logger.error('Failed to initiate connection:', error);
-            throw error;
-        }
-    }
-
     private async monitorInboundTopic(): Promise<void> {
-        if (!this.monitoring || this.polling) return;
-        this.polling = true;
+        if (!this.monitoring) return;
 
         try {
             const { messages } = await this.client.getMessages(this.inboundTopicId);
-            const newRequests = messages.filter(msg => msg.op === 'connection_request' && msg.sequence_number > this.lastProcessedMessage)
+
+            const connectionRequests = messages
+                .filter(msg => msg.op === 'connection_request' && msg.sequence_number > this.lastProcessedMessage)
                 .sort((a, b) => a.sequence_number - b.sequence_number);
 
-            for (const request of newRequests) {
-                const existing = [...this.connections.values()].some(conn => conn.metadata?.requestId === request.sequence_number);
-                if (existing) {
-                    this.logger.debug(`Duplicate request ${request.sequence_number} ignored`);
-                    continue;
-                }
-
+            for (const request of connectionRequests) {
                 this.lastProcessedMessage = Math.max(this.lastProcessedMessage, request.sequence_number);
                 await this.handleConnectionRequest(request);
             }
         } catch (error) {
             this.logger.error('Error monitoring inbound topic:', error);
             this.emit('error', error);
-        } finally {
-            this.polling = false;
+        }
+
+        if (this.monitoring) {
+            setTimeout(() => this.monitorInboundTopic(), this.pollInterval);
         }
     }
 
@@ -120,15 +90,19 @@ class ConnectionManager extends EventEmitter {
             const requestingAccountId = request.operator_id.split('@')[1];
             const connectionRequestId = request.sequence_number;
 
-            this.logger.debug(`New connection request from: ${requestingAccountId}`);
+            this.logger.info(`New connection request from: ${requestingAccountId}`);
+            this.logger.debug('Request:', request);
 
-            const response = await this.client.handleConnectionRequest(
+            // ✅ Confirm the connection on the same inbound topic
+            const sequenceNumber = await this.client.confirmConnection(
                 this.inboundTopicId,
+                this.inboundTopicId, // Confirm on same topic (no new topic)
                 requestingAccountId,
-                connectionRequestId
+                connectionRequestId,
+                'Connection confirmed'
             );
 
-            const connectionTopicId = response.connectionTopicId;
+            const connectionTopicId = this.inboundTopicId;
             const connectionId = `conn-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
             this.connections.set(connectionId, {
@@ -136,13 +110,22 @@ class ConnectionManager extends EventEmitter {
                 targetAccountId: requestingAccountId,
                 isActive: true,
                 lastActivity: Date.now(),
-                metadata: { initiator: false, created: new Date().toISOString(), requestId: connectionRequestId }
+                metadata: {
+                    initiator: false,
+                    confirmedAt: new Date().toISOString(),
+                    requestId: connectionRequestId,
+                    sequenceNumber,
+                },
             });
 
-            this.logger.info(`Connection established: ${connectionId} -> ${connectionTopicId}`);
-            this.emit('connection', { id: connectionId, topicId: connectionTopicId, targetAccountId: requestingAccountId });
+            this.logger.info(`Connection confirmed: ${connectionId} -> ${connectionTopicId}`);
+            this.emit('connection', {
+                id: connectionId,
+                topicId: connectionTopicId,
+                targetAccountId: requestingAccountId,
+            });
         } catch (error) {
-            this.logger.error('Failed to handle connection request:', error);
+            this.logger.error('Failed to confirm connection request:', error);
             this.emit('error', error);
         }
     }
@@ -157,13 +140,16 @@ class ConnectionManager extends EventEmitter {
         try {
             await this.client.sendMessage(
                 connection.connectionTopicId,
-                JSON.stringify({ type: 'close_connection', reason, timestamp: new Date().toISOString() }),
+                JSON.stringify({
+                    type: 'close_connection',
+                    reason,
+                    timestamp: new Date().toISOString(),
+                }),
                 'Connection close'
             );
 
             connection.isActive = false;
             this.connections.set(connectionId, connection);
-
             this.logger.info(`Connection closed: ${connectionId}`);
             this.emit('close', { id: connectionId, reason });
             return true;
