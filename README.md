@@ -32,8 +32,11 @@ To **democratize** the creation, discovery, and monetization of AI agents throug
 
 Learn more: [How AgentVerse Works →](https://dorahacks.io/buidl/26102/#:~:text=How%20AgentVerse%20Works)
 
+## ▶️ Watch the Demo
 
-[![Watch the demo](https://img.youtube.com/vi/xgFdDBX_1qM/maxresdefault.jpg)](https://www.youtube.com/watch?v=xgFdDBX_1qM)
+<a href="https://www.youtube.com/watch?v=xgFdDBX_1qM" target="_blank" rel="noopener noreferrer">
+  <img src="https://img.youtube.com/vi/xgFdDBX_1qM/maxresdefault.jpg" alt="Watch the demo" />
+</a>
 
 ---
 
