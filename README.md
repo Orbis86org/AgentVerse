@@ -8,13 +8,11 @@ For developers, AgentVerse makes it easy to publish and manage their AI agents. 
 
 AgentVerse brings users and developers together in one place to make AI more **useful**, **secure**, and **accessible**.
 
----
 
 ## 🎯 Vision
 
 To **democratize** the creation, discovery, and monetization of AI agents through a **decentralized**, **transparent**, and **interoperable** Web3 platform — empowering individuals and communities to build, share, and benefit from intelligent automation.
 
----
 
 ## 🚀 Key Features
 
@@ -24,7 +22,6 @@ To **democratize** the creation, discovery, and monetization of AI agents throug
 -  **Secure Agent Registration:** AES-256-GCM encryption and HCS-10-backed identity for agents
 -  **Onchain Logs via HCS-10:** All agent interactions and payments are transparently recorded
 
----
 
 ## 🛣️ Roadmap Highlights
 
